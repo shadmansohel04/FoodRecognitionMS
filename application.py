@@ -8,7 +8,6 @@ import torch.nn.functional as F
 import io
 import math
 import gc
-import psutil
 import os
 
 app = Flask(__name__)
@@ -53,10 +52,6 @@ transform = transforms.Compose([
                          [0.229, 0.224, 0.225])
 ])
 
-def get_memory_usage_mb():
-    process = psutil.Process(os.getpid())
-    return process.memory_info().rss / (1024 * 1024)  # in MB
-
 @app.route('/detect', methods=['POST'])
 def detect():
     try:
@@ -79,9 +74,6 @@ def detect():
         del input_tensor, outputs, probabilities, predicted_class
         gc.collect()
 
-        mem_usage = get_memory_usage_mb()
-        print(f"[DEBUG] Current RAM usage: {mem_usage:.2f} MB")
-
         if max_prob < CONF_THRESHOLD:
             return jsonify({
                 "success": False,
@@ -102,5 +94,5 @@ def detect():
         }), 400
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(debug=True, host="0.0.0.0", port=port)
+    port = os.getenv("PORT") or 3000
+    app.run(debug=True, port=port)
