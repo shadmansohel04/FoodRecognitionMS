@@ -10,8 +10,8 @@ import math
 import gc
 import os
 
-app = Flask(__name__)
-CORS(app)
+application = Flask(__name__)
+CORS(application)
 CONF_THRESHOLD = 0.7
 
 # Device (force CPU if you want predictable memory usage)
@@ -52,7 +52,13 @@ transform = transforms.Compose([
                          [0.229, 0.224, 0.225])
 ])
 
-@app.route('/detect', methods=['POST'])
+@application.route("/", methods=["GET"])
+def home():
+    return jsonify({
+        "success": "yipppee"
+    })
+
+@application.route('/detect', methods=['POST'])
 def detect():
     try:
         if 'frame' not in request.files:
@@ -95,4 +101,4 @@ def detect():
 
 if __name__ == '__main__':
     port = os.getenv("PORT") or 3000
-    app.run(debug=True, port=port)
+    application.run(debug=True, port=port)
